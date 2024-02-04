@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 
+	"github.com/FerMusicComposer/hotel-reservation-backend/api"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,15 +14,7 @@ func main() {
 	app := fiber.New()
 	apiV1 := app.Group("/api/v1")
 
-	app.Get("/foo", handleFoo)
-	apiV1.Get("/user", handleUser)
+	apiV1.Get("/users", api.HandleGetUsers)
+	apiV1.Get("/user/:id", api.HandleGetUser)
 	app.Listen(*listenAddr)
-}
-
-func handleFoo(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"msg": "working just fine!!!"})
-}
-
-func handleUser(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"user": "James Foo"})
 }
