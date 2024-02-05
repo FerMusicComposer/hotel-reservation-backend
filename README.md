@@ -1,5 +1,6 @@
 
 # Hotel reservation backend
+1st project from Anthony GG's Full Time Go Dev course 
 
 # Project environment variables
 ```
