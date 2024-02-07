@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/FerMusicComposer/hotel-reservation-backend/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,11 +13,17 @@ import (
 const userColl = "users"
 
 type UserStore interface {
+	Dropper
+
 	GetUserByID(context.Context, string) (*models.User, error)
 	GetUsers(context.Context) ([]*models.User, error)
 	InsertUser(context.Context, *models.User) (*models.User, error)
 	UpdateUser(ctx context.Context, filter bson.M, params models.UpdateUserParams) error
 	DeleteUser(context.Context, string) error
+}
+
+type Dropper interface {
+	Drop(context.Context) error
 }
 
 type MongoUserStore struct {
@@ -30,6 +37,15 @@ func NewMongoUserStore(conn *MongoConnection) *MongoUserStore {
 		coll:       conn.Database.Collection(userColl),
 	}
 }
+
+func (s *MongoUserStore) Drop(ctx context.Context) error {
+	fmt.Println("dropping users collection")
+	return s.coll.Database().Client().Disconnect(ctx)
+}
+
+// ------------------
+// USER CRUD METHODS
+// ------------------
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*models.User, error) {
 	cur, err := s.coll.Find(ctx, bson.M{})
