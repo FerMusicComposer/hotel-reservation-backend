@@ -22,10 +22,6 @@ type UserStore interface {
 	DeleteUser(context.Context, string) error
 }
 
-type Dropper interface {
-	Drop(context.Context) error
-}
-
 type MongoUserStore struct {
 	connection *MongoConnection
 	coll       *mongo.Collection
@@ -40,7 +36,7 @@ func NewMongoUserStore(conn *MongoConnection) *MongoUserStore {
 
 func (s *MongoUserStore) Drop(ctx context.Context) error {
 	fmt.Println("dropping users collection")
-	return s.coll.Database().Client().Disconnect(ctx)
+	return s.coll.Database().Drop(ctx)
 }
 
 // ------------------
