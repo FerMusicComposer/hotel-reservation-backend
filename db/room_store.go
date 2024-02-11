@@ -15,6 +15,9 @@ const roomColl = "rooms"
 type RoomStore interface {
 	Dropper
 
+	GetRooms(context.Context) ([]*models.Room, error)
+	GetRoomsByHotelID(context.Context, bson.M) ([]*models.Room, error)
+	GetRoomByID(context.Context, string) (*models.Room, error)
 	InsertRoom(context.Context, *models.Room) (*models.Room, error)
 }
 
@@ -41,6 +44,48 @@ func (s *MongoRoomStore) Drop(ctx context.Context) error {
 // ------------------
 // ROOM CRUD METHODS
 // ------------------
+
+func (s *MongoRoomStore) GetRooms(ctx context.Context) ([]*models.Room, error) {
+	cursor, err := s.coll.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+
+	var rooms []*models.Room
+	if err := cursor.All(ctx, &rooms); err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
+}
+
+func (s *MongoRoomStore) GetRoomsByHotelID(ctx context.Context, filter bson.M) ([]*models.Room, error) {
+	cursor, err := s.coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var rooms []*models.Room
+	if err := cursor.All(ctx, &rooms); err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
+}
+
+func (s *MongoRoomStore) GetRoomByID(ctx context.Context, id string) (*models.Room, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var room models.Room
+	if err := s.coll.FindOne(ctx, bson.M{"_id": objID}).Decode(&room); err != nil {
+		return nil, err
+	}
+
+	return &room, nil
+}
 
 func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *models.Room) (*models.Room, error) {
 	res, err := s.coll.InsertOne(ctx, room)
