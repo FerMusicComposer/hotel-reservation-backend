@@ -10,14 +10,69 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var (
-	hotel = models.Hotel{
-		Name:     "Hilton",
-		Location: "London",
-		Rooms:    []primitive.ObjectID{},
+type hotelData struct {
+	name     string
+	location string
+	rating   float64
+}
+
+func main() {
+	hotels := []hotelData{
+		{
+			name:     "Hilton Rome",
+			location: "Rome",
+			rating:   4.5,
+		},
+		{
+			name:     "Melia London",
+			location: "London",
+			rating:   4.0,
+		},
+		{
+			name:     "Marriott Paris",
+			location: "Paris",
+			rating:   3.5,
+		},
+		{
+			name:     "Palacio Real",
+			location: "Madrid",
+			rating:   5.0,
+		},
+	}
+	ctx := context.Background()
+
+	conn, err := db.NewMongoConnection(db.DBURI, db.DBNAME)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	rooms = []models.Room{
+	if err := conn.Database.Drop(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	hotelStore := db.NewMongoHotelStore(conn)
+	roomStore := db.NewMongoRoomStore(conn, hotelStore)
+
+	fmt.Println("seeding database...")
+
+	for _, hotel := range hotels {
+		seedHotel(hotel.name, hotel.location, hotel.rating, hotelStore, roomStore, ctx)
+		fmt.Println("------------------------------")
+	}
+
+	conn.Database.Client().Disconnect(ctx)
+
+}
+
+func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, roomStore db.RoomStore, ctx context.Context) {
+	hotel := models.Hotel{
+		Name:     name,
+		Location: location,
+		Rooms:    []primitive.ObjectID{},
+		Rating:   rating,
+	}
+
+	rooms := []models.Room{
 		{
 			Type:      models.SingleRoomType,
 			BasePrice: 99.9,
@@ -35,24 +90,6 @@ var (
 			BasePrice: 399.9,
 		},
 	}
-)
-
-func main() {
-	ctx := context.Background()
-
-	conn, err := db.NewMongoConnection(db.DBURI, db.DBNAME)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err := conn.Database.Drop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	hotelStore := db.NewMongoHotelStore(conn)
-	roomStore := db.NewMongoRoomStore(conn, hotelStore)
-
-	fmt.Println("seeding database...")
 
 	insertedHotel, err := hotelStore.InsertHotel(ctx, &hotel)
 	if err != nil {
@@ -73,5 +110,4 @@ func main() {
 
 		fmt.Println("inserted room: ", insertedRoom.ID)
 	}
-
 }

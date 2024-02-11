@@ -28,14 +28,20 @@ func main() {
 
 	// handlers initialization
 	userHandler := api.NewUserHandler(db.NewMongoUserStore(conn))
+	hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(conn))
 
 	app := fiber.New(fiberConfig)
 	apiV1 := app.Group("/api/v1")
 
+	// USER ROUTES
 	apiV1.Get("/user", userHandler.HandleGetUsers)
 	apiV1.Get("/user/:id", userHandler.HandleGetUser)
 	apiV1.Post("/user", userHandler.HandlePostUser)
 	apiV1.Put("/user/:id", userHandler.HandlePutUser)
 	apiV1.Delete("/user/:id", userHandler.HandleDeleteUser)
+
+	// HOTEL ROUTES
+	apiV1.Get("/hotel", hotelHandler.HandleGetHotels)
+
 	app.Listen(*listenAddr)
 }
