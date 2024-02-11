@@ -74,20 +74,24 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 
 	rooms := []models.Room{
 		{
-			Type:      models.SingleRoomType,
-			BasePrice: 99.9,
+			Size:    "single",
+			Seaside: true,
+			Price:   99.9,
 		},
 		{
-			Type:      models.DoubleRoomType,
-			BasePrice: 199.9,
+			Size:    "double",
+			Seaside: false,
+			Price:   199.9,
 		},
 		{
-			Type:      models.SeaSideRoomType,
-			BasePrice: 299.9,
+			Size:    "king",
+			Seaside: false,
+			Price:   299.9,
 		},
 		{
-			Type:      models.DeluxeRoomType,
-			BasePrice: 399.9,
+			Size:    "king deluxe",
+			Seaside: true,
+			Price:   399.9,
 		},
 	}
 

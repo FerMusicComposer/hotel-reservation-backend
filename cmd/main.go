@@ -43,6 +43,7 @@ func main() {
 
 	// HOTEL ROUTES
 	apiV1.Get("/hotel", hotelHandler.HandleGetHotels)
+	apiV1.Get("/hotel/:id", hotelHandler.HandleGetHotelById)
 	apiV1.Get("/hotel/:id/rooms", roomHandler.HandleGetRoomsByHotelID)
 
 	// ROOM ROUTES
