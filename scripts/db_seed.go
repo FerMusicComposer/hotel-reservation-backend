@@ -15,6 +15,12 @@ type hotelData struct {
 	location string
 	rating   float64
 }
+type userData struct {
+	fname    string
+	lname    string
+	email    string
+	password string
+}
 
 func main() {
 	hotels := []hotelData{
@@ -39,6 +45,34 @@ func main() {
 			rating:   5.0,
 		},
 	}
+
+	users := []userData{
+		{
+			fname:    "John",
+			lname:    "Doe",
+			email:    "jdoe@me.com",
+			password: "password1123456789",
+		},
+		{
+			fname:    "Jane",
+			lname:    "Doe",
+			email:    "jane@me.com",
+			password: "password1123456789",
+		},
+		{
+			fname:    "Mike",
+			lname:    "Miller",
+			email:    "miller@me.com",
+			password: "password1123456789",
+		},
+		{
+			fname:    "Sarah",
+			lname:    "Smith",
+			email:    "smith@me.com",
+			password: "password1123456789",
+		},
+	}
+
 	ctx := context.Background()
 
 	conn, err := db.NewMongoConnection(db.DBURI, db.DBNAME)
@@ -52,11 +86,17 @@ func main() {
 
 	hotelStore := db.NewMongoHotelStore(conn)
 	roomStore := db.NewMongoRoomStore(conn, hotelStore)
+	userStore := db.NewMongoUserStore(conn)
 
 	fmt.Println("seeding database...")
 
 	for _, hotel := range hotels {
 		seedHotel(hotel.name, hotel.location, hotel.rating, hotelStore, roomStore, ctx)
+		fmt.Println("------------------------------")
+	}
+
+	for _, user := range users {
+		seedUser(user.fname, user.lname, user.email, user.password, userStore, ctx)
 		fmt.Println("------------------------------")
 	}
 
@@ -114,4 +154,25 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 
 		fmt.Println("inserted room: ", insertedRoom.ID)
 	}
+}
+
+func seedUser(fname, lname, email, password string, userStore db.UserStore, ctx context.Context) {
+	user, err := models.NewUserFromParams(models.CreateUserParams{
+		FirstName: fname,
+		LastName:  lname,
+		Email:     email,
+		Password:  password,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	insertedUser, err := userStore.InsertUser(ctx, user)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("inserted user: ", insertedUser)
+
 }

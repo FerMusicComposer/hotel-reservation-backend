@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/FerMusicComposer/hotel-reservation-backend/api"
+	"github.com/FerMusicComposer/hotel-reservation-backend/api/middleware"
 	"github.com/FerMusicComposer/hotel-reservation-backend/db"
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,12 +28,17 @@ func main() {
 	}
 
 	// handlers initialization
+	authHandler := api.NewAuthHandler(db.NewMongoUserStore(conn))
 	userHandler := api.NewUserHandler(db.NewMongoUserStore(conn))
 	hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(conn))
 	roomHandler := api.NewRoomHandler(db.NewMongoRoomStore(conn, db.NewMongoHotelStore(conn)))
 
 	app := fiber.New(fiberConfig)
-	apiV1 := app.Group("/api/v1")
+	auth := app.Group("/api")
+	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication)
+
+	// AUTH ROUTES
+	auth.Post("/auth", authHandler.HandleAuthenticate)
 
 	// USER ROUTES
 	apiV1.Get("/user", userHandler.HandleGetUsers)

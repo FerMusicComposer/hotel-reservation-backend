@@ -16,6 +16,7 @@ type UserStore interface {
 	Dropper
 
 	GetUserByID(context.Context, string) (*models.User, error)
+	GetUserByEmail(context.Context, string) (*models.User, error)
 	GetUsers(context.Context) ([]*models.User, error)
 	InsertUser(context.Context, *models.User) (*models.User, error)
 	UpdateUser(ctx context.Context, filter bson.M, params models.UpdateUserParams) error
@@ -43,20 +44,6 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 // USER CRUD METHODS
 // ------------------
 
-func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*models.User, error) {
-	cur, err := s.coll.Find(ctx, bson.M{})
-	if err != nil {
-		return nil, err
-	}
-
-	var users []*models.User
-	if err := cur.All(ctx, &users); err != nil {
-		return nil, err // return empty slice of users. err is nill otherwise we get the err
-	}
-
-	return users, nil
-}
-
 func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*models.User, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -69,6 +56,29 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*models.Us
 	}
 
 	return &user, nil
+}
+
+func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	var user models.User
+	if err := s.coll.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*models.User, error) {
+	cur, err := s.coll.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*models.User
+	if err := cur.All(ctx, &users); err != nil {
+		return nil, err // return empty slice of users. err is nill otherwise we get the err
+	}
+
+	return users, nil
 }
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, user *models.User) (*models.User, error) {
