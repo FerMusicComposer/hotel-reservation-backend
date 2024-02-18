@@ -1,8 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,7 +10,6 @@ import (
 	"github.com/FerMusicComposer/hotel-reservation-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AuthHandler struct {
@@ -23,12 +22,22 @@ type AuthParams struct {
 }
 
 type AuthResponse struct {
-	User  *models.User `json:"user"`
-	Token string       `json:"token"`
+	User   *models.User `json:"user"`
+	Token  string       `json:"token"`
+	Status int          `json:"status"`
+	Msg    string       `json:"msg"`
 }
 
 func NewAuthHandler(userStore db.UserStore) *AuthHandler {
 	return &AuthHandler{userStore: userStore}
+}
+
+func invalidCredentials(c *fiber.Ctx) error {
+	fmt.Println("unauthorized")
+	return c.Status(http.StatusUnauthorized).JSON(AuthResponse{
+		Status: http.StatusUnauthorized,
+		Msg:    "unauthorized",
+	})
 }
 
 func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
@@ -40,21 +49,20 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 
 	user, err := h.userStore.GetUserByEmail(c.Context(), params.Email)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("invalid credentials")
-		}
-		return err
+		return invalidCredentials(c)
 	}
 
 	if !models.IsPasswordValid(user.EncryptedPassword, params.Password) {
-		return fmt.Errorf("invalid credentials")
+		return invalidCredentials(c)
 	}
 
 	token := createTokenFromUser(user)
 
 	response := AuthResponse{
-		User:  user,
-		Token: token,
+		User:   user,
+		Token:  token,
+		Status: http.StatusOK,
+		Msg:    "OK",
 	}
 
 	fmt.Println("authenticated -->" + user.Email)
