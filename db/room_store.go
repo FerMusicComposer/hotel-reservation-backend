@@ -19,20 +19,18 @@ type RoomStore interface {
 	GetRoomsByHotelID(context.Context, bson.M) ([]*models.Room, error)
 	GetRoomByID(context.Context, string) (*models.Room, error)
 	InsertRoom(context.Context, *models.Room) (*models.Room, error)
+	UpdateRoom(context.Context, bson.M, bson.M) error
 }
 
 type MongoRoomStore struct {
 	connection *MongoConnection
 	coll       *mongo.Collection
-
-	HotelStore
 }
 
-func NewMongoRoomStore(conn *MongoConnection, hotelStore HotelStore) *MongoRoomStore {
+func NewMongoRoomStore(conn *MongoConnection) *MongoRoomStore {
 	return &MongoRoomStore{
 		connection: conn,
 		coll:       conn.Database.Collection(roomColl),
-		HotelStore: hotelStore,
 	}
 }
 
@@ -94,11 +92,11 @@ func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *models.Room) (*mo
 	}
 
 	room.ID = res.InsertedID.(primitive.ObjectID)
-	filter := bson.M{"_id": room.HotelId}
-	update := bson.M{"$push": bson.M{"rooms": room.ID}}
-	if err = s.HotelStore.UpdateHotel(ctx, filter, update); err != nil {
-		return nil, err
-	}
 
 	return room, nil
+}
+
+func (s *MongoRoomStore) UpdateRoom(ctx context.Context, filter, update bson.M) error {
+	_, err := s.coll.UpdateOne(ctx, filter, update)
+	return err
 }

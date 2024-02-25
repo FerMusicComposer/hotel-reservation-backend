@@ -7,6 +7,7 @@ import (
 
 	"github.com/FerMusicComposer/hotel-reservation-backend/db"
 	"github.com/FerMusicComposer/hotel-reservation-backend/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -85,7 +86,7 @@ func main() {
 	}
 
 	hotelStore := db.NewMongoHotelStore(conn)
-	roomStore := db.NewMongoRoomStore(conn, hotelStore)
+	roomStore := db.NewMongoRoomStore(conn)
 	userStore := db.NewMongoUserStore(conn)
 
 	fmt.Println("seeding database...")
@@ -114,24 +115,40 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 
 	rooms := []models.Room{
 		{
-			Size:    "single",
-			Seaside: true,
-			Price:   99.9,
+			Size:        "single",
+			Seaside:     true,
+			Price:       99.9,
+			MaxCapacity: 2,
+			Status: []models.RoomStatus{
+				{Status: "available"},
+			},
 		},
 		{
-			Size:    "double",
-			Seaside: false,
-			Price:   199.9,
+			Size:        "double",
+			Seaside:     false,
+			Price:       199.9,
+			MaxCapacity: 4,
+			Status: []models.RoomStatus{
+				{Status: "available"},
+			},
 		},
 		{
-			Size:    "king",
-			Seaside: false,
-			Price:   299.9,
+			Size:        "king",
+			Seaside:     false,
+			Price:       299.9,
+			MaxCapacity: 6,
+			Status: []models.RoomStatus{
+				{Status: "available"},
+			},
 		},
 		{
-			Size:    "king deluxe",
-			Seaside: true,
-			Price:   399.9,
+			Size:        "king deluxe",
+			Seaside:     true,
+			Price:       399.9,
+			MaxCapacity: 8,
+			Status: []models.RoomStatus{
+				{Status: "available"},
+			},
 		},
 	}
 
@@ -150,9 +167,14 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 			log.Fatal(err)
 		}
 
-		_ = append(insertedHotel.Rooms, insertedRoom.ID)
+		room.ID = insertedRoom.ID
+		filter := bson.M{"_id": insertedHotel.ID}
+		update := bson.M{"$push": bson.M{"rooms": room.ID}}
+		hotelStore.UpdateHotel(ctx, filter, update)
 
-		fmt.Println("inserted room: ", insertedRoom.ID)
+		// _ = append(insertedHotel.Rooms, room.ID)
+
+		fmt.Println("Added to hotel room: ", room.ID)
 	}
 }
 

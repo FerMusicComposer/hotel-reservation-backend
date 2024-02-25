@@ -30,11 +30,14 @@ func main() {
 	// handlers initialization
 	userStore := db.NewMongoUserStore(conn)
 	hotelStore := db.NewMongoHotelStore(conn)
+	roomStore := db.NewMongoRoomStore(conn)
+	bookingStore := db.NewMongoBookingStore(conn)
 
 	authHandler := api.NewAuthHandler(userStore)
 	userHandler := api.NewUserHandler(userStore)
-	hotelHandler := api.NewHotelHandler(db.NewMongoHotelStore(conn))
-	roomHandler := api.NewRoomHandler(db.NewMongoRoomStore(conn, hotelStore))
+	hotelHandler := api.NewHotelHandler(hotelStore)
+	roomHandler := api.NewRoomHandler(roomStore, bookingStore, hotelStore)
+	bookingHandler := api.NewBookingHandler(bookingStore)
 
 	app := fiber.New(fiberConfig)
 	auth := app.Group("/api")
@@ -58,6 +61,11 @@ func main() {
 	// ROOM ROUTES
 	apiV1.Get("/room", roomHandler.HandleGetRooms)
 	apiV1.Post("/room/:id/book", roomHandler.HandleBookRoom)
+	apiV1.Post("/room", roomHandler.HandlePostRoom)
+
+	// BOOKING ROUTES
+	apiV1.Get("/booking", bookingHandler.HandleGetAllBookings)
+	apiV1.Get("/booking/:id", bookingHandler.HandleGetUserBooking)
 
 	app.Listen(*listenAddr)
 }
