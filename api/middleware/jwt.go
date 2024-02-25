@@ -40,6 +40,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		}
 
 		c.Context().SetUserValue("user", user)
+		c.Locals("userClaims", claims)
 
 		return c.Next()
 	}

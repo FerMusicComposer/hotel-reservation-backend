@@ -21,6 +21,7 @@ type userData struct {
 	lname    string
 	email    string
 	password string
+	role     string
 }
 
 func main() {
@@ -53,24 +54,28 @@ func main() {
 			lname:    "Doe",
 			email:    "jdoe@me.com",
 			password: "password1123456789",
+			role:     "user",
 		},
 		{
 			fname:    "Jane",
 			lname:    "Doe",
 			email:    "jane@me.com",
 			password: "password1123456789",
+			role:     "user",
 		},
 		{
 			fname:    "Mike",
 			lname:    "Miller",
 			email:    "miller@me.com",
 			password: "password1123456789",
+			role:     "admin",
 		},
 		{
 			fname:    "Sarah",
 			lname:    "Smith",
 			email:    "smith@me.com",
 			password: "password1123456789",
+			role:     "user",
 		},
 	}
 
@@ -97,7 +102,7 @@ func main() {
 	}
 
 	for _, user := range users {
-		seedUser(user.fname, user.lname, user.email, user.password, userStore, ctx)
+		seedUser(user.fname, user.lname, user.email, user.password, user.role, userStore, ctx)
 		fmt.Println("------------------------------")
 	}
 
@@ -178,12 +183,13 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 	}
 }
 
-func seedUser(fname, lname, email, password string, userStore db.UserStore, ctx context.Context) {
+func seedUser(fname, lname, email, password, role string, userStore db.UserStore, ctx context.Context) {
 	user, err := models.NewUserFromParams(models.CreateUserParams{
 		FirstName: fname,
 		LastName:  lname,
 		Email:     email,
 		Password:  password,
+		Role:      role,
 	})
 
 	if err != nil {

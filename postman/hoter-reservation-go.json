@@ -1,0 +1,480 @@
+{
+	"info": {
+		"_postman_id": "af5f4afb-a56b-4d1b-94a9-3ae95c2e7713",
+		"name": "Go",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12601307"
+	},
+	"item": [
+		{
+			"name": "AGG-hotel-reservation-backend",
+			"item": [
+				{
+					"name": "Auth Routes",
+					"item": [
+						{
+							"name": "Authentication",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"miller@me.com\",\r\n    \"password\": \"password1123456789\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/auth",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"auth"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User Routes",
+					"item": [
+						{
+							"name": "InsertUser",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Luffy\",\r\n    \"lastName\": \"Monkey D.\",\r\n    \"email\": \"meat@waterseven.op\",\r\n    \"password\": \"meeeeat4561231\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/v1/user",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetUsers - Admin only",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/user",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"user"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetUserById",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/user/65c2bea78d9c7b2ec57eefd5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"65c2bea78d9c7b2ec57eefd5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DeleteUser",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/user/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										""
+									],
+									"query": [
+										{
+											"key": "x-api-token",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UpdateUser",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"lastName\": \"Monkey D.\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/v1/user/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Hotel Routes",
+					"item": [
+						{
+							"name": "GetHotels",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4ODc3MjYyLCJpZCI6IjY1ZGIyNmU5MmEwM2JiNjYxNzNkNWFmYiJ9.TTF2rr33_MrA3_DlrketeLeUR0gnKgSq3TntoUt9MyU",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/hotel",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"hotel"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetHotelByID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4ODc3MjYyLCJpZCI6IjY1ZGIyNmU5MmEwM2JiNjYxNzNkNWFmYiJ9.TTF2rr33_MrA3_DlrketeLeUR0gnKgSq3TntoUt9MyU",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/hotel/65ceb7ef8588b50dac5158c4",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"hotel",
+										"65ceb7ef8588b50dac5158c4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetRoomsByHotelId",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/hotel/65c94ed406888a57124a3c51/rooms?x-api-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"hotel",
+										"65c94ed406888a57124a3c51",
+										"rooms"
+									],
+									"query": [
+										{
+											"key": "x-api-token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Rooms Routes",
+					"item": [
+						{
+							"name": "GetRooms",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODkxNjkzMiwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.cA-I2FfM6ZOjaUmJwSOO-YTn2UUh4e-beixwQr3htds",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/room",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"room"
+									],
+									"query": [
+										{
+											"key": "x-api-token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4Mjg3MDMxLCJpZCI6IjY1Y2ViN2YwODU4OGI1MGRhYzUxNThkYSJ9.vvxObssmPLaw6q7RSV6et9ctMKiONO-9pyHV3SeNmNw",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "BookRoom",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODkxNjkzMiwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.cA-I2FfM6ZOjaUmJwSOO-YTn2UUh4e-beixwQr3htds",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"numPeople\": 2,\r\n    \"fromDate\": \"2024-04-05T12:00:00Z\",\r\n    \"toDate\": \"2024-04-08T23:00:00Z\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/v1/room/65dbbce474929607f63ed605/book",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"room",
+										"65dbbce474929607f63ed605",
+										"book"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "InsertRoom",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4ODc3MjYyLCJpZCI6IjY1ZGIyNmU5MmEwM2JiNjYxNzNkNWFmYiJ9.TTF2rr33_MrA3_DlrketeLeUR0gnKgSq3TntoUt9MyU",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"hotelID\": \"65db26e82a03bb66173d5aea\",\r\n    \"size\": \"Penthouse\",\r\n    \"price\": 899.99,\r\n    \"maxcapacity\": 10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/v1/room",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"room"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Bookings Routes",
+					"item": [
+						{
+							"name": "GetAllBookings - Admin only",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODkxNjkzMiwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.cA-I2FfM6ZOjaUmJwSOO-YTn2UUh4e-beixwQr3htds",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/admin/booking",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"booking"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -16,6 +16,7 @@ type BookingStore interface {
 	Dropper
 
 	GetBookings(ctx context.Context, filter bson.M) ([]*models.Booking, error)
+	GetBookingByID(ctx context.Context, id string) (*models.Booking, error)
 	InsertBooking(ctx context.Context, booking *models.Booking) (*models.Booking, error)
 }
 
@@ -49,6 +50,22 @@ func (s *MongoBookingStore) GetBookings(ctx context.Context, filter bson.M) ([]*
 	}
 
 	return bookings, nil
+}
+
+func (s *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*models.Booking, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var booking *models.Booking
+
+	res := s.coll.FindOne(ctx, bson.M{"_id": objID})
+	if err := res.Decode(&booking); err != nil {
+		return nil, err
+	}
+
+	return booking, nil
 }
 
 func (s *MongoBookingStore) InsertBooking(ctx context.Context, booking *models.Booking) (*models.Booking, error) {

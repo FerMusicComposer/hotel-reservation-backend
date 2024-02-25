@@ -65,7 +65,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		Msg:    "OK",
 	}
 
-	fmt.Println("authenticated -->" + user.Email)
+	fmt.Printf("authenticated --> %s ; role: %s", user.Email, user.Role)
 
 	return c.JSON(response)
 }
@@ -75,6 +75,7 @@ func createTokenFromUser(user *models.User) string {
 	claims := jwt.MapClaims{
 		"id":      user.ID,
 		"email":   user.Email,
+		"role":    user.Role,
 		"expires": expires,
 	}
 
