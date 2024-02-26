@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/FerMusicComposer/hotel-reservation-backend/api"
 	"github.com/FerMusicComposer/hotel-reservation-backend/api/middleware"
 	"github.com/FerMusicComposer/hotel-reservation-backend/db"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 // custom fiber config for custom error handling
@@ -19,7 +21,12 @@ var fiberConfig = fiber.Config{
 }
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":5000", "API Server listen address")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	listenAddr := flag.String("listenAddr", os.Getenv("HTTP_LISTEN_ADDRESS"), "API Server listen address")
 	flag.Parse()
 
 	conn, err := db.NewMongoConnection(db.DBURI, db.DBNAME)

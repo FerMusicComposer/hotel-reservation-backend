@@ -451,7 +451,7 @@
 								"header": [
 									{
 										"key": "x-api-token",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODkxNjkzMiwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.cA-I2FfM6ZOjaUmJwSOO-YTn2UUh4e-beixwQr3htds",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4OTQ1NDQxLCJpZCI6IjY1ZGJiY2U1NzQ5Mjk2MDdmNjNlZDYxYSIsInJvbGUiOiJhZG1pbiJ9.zB3-3Dx2PgInklj0QWgo51NED2Y0BR35SKfpC-Uid1k",
 										"type": "text"
 									}
 								],
@@ -467,6 +467,41 @@
 										"v1",
 										"admin",
 										"booking"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetUserBooking - User only",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODk0NzAxNSwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.Kxr7nEPH8olM2hvgoTpbXFjn9Fhj8Z-h63fHEBslVy0",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/booking/65dbc8e98cbc2adb163f1dbc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"booking",
+										"65dbc8e98cbc2adb163f1dbc"
+									],
+									"query": [
+										{
+											"key": "x-api-token",
+											"value": "",
+											"disabled": true
+										}
 									]
 								}
 							},
