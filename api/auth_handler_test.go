@@ -8,7 +8,7 @@ import (
 )
 
 func TestAuthenticate(t *testing.T) {
-	tdb := setup(t)
+	tdb := setup()
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(tdb.UserStore)

@@ -67,7 +67,11 @@ func (h *BookingHandler) HandleGetUserBooking(c *fiber.Ctx) error {
 
 	user, ok := c.Context().UserValue("user").(*models.User)
 	if !ok {
-		return err
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			fiber.Map{
+				"error": "internal server error",
+			},
+		)
 	}
 
 	if booking.UserID != user.ID {
@@ -78,4 +82,8 @@ func (h *BookingHandler) HandleGetUserBooking(c *fiber.Ctx) error {
 		)
 	}
 	return c.JSON(booking)
+}
+
+func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
+	return nil
 }

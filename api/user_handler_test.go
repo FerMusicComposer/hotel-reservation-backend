@@ -8,7 +8,7 @@ import (
 )
 
 func TestPostUser(t *testing.T) {
-	tdb := setup(t)
+	tdb := setup()
 
 	app := fiber.New()
 	userHandler := NewUserHandler(tdb.UserStore)

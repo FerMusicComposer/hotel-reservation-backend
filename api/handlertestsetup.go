@@ -24,7 +24,7 @@ type testdb struct {
 	db.UserStore
 }
 
-func setup(t *testing.T) *testdb {
+func setup() *testdb {
 	client, err := db.NewMongoConnection(testmongoURI, tesdtDbName)
 	if err != nil {
 		log.Fatal(err)
