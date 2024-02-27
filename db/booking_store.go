@@ -18,27 +18,28 @@ type BookingStore interface {
 	GetBookings(ctx context.Context, filter bson.M) ([]*models.Booking, error)
 	GetBookingByID(ctx context.Context, id string) (*models.Booking, error)
 	InsertBooking(ctx context.Context, booking *models.Booking) (*models.Booking, error)
+	UpdateBooking(ctx context.Context, id string, update bson.M) error
 }
 
 type MongoBookingStore struct {
 	connection *MongoConnection
-	coll       *mongo.Collection
+	collection *mongo.Collection
 }
 
 func NewMongoBookingStore(conn *MongoConnection) *MongoBookingStore {
 	return &MongoBookingStore{
 		connection: conn,
-		coll:       conn.Database.Collection(bookingColl),
+		collection: conn.Database.Collection(bookingColl),
 	}
 }
 
-func (s *MongoBookingStore) Drop(ctx context.Context) error {
+func (store *MongoBookingStore) Drop(ctx context.Context) error {
 	fmt.Println("dropping bookings collection")
-	return s.coll.Database().Drop(ctx)
+	return store.collection.Database().Drop(ctx)
 }
 
-func (s *MongoBookingStore) GetBookings(ctx context.Context, filter bson.M) ([]*models.Booking, error) {
-	res, err := s.coll.Find(ctx, filter)
+func (store *MongoBookingStore) GetBookings(ctx context.Context, filter bson.M) ([]*models.Booking, error) {
+	res, err := store.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +53,7 @@ func (s *MongoBookingStore) GetBookings(ctx context.Context, filter bson.M) ([]*
 	return bookings, nil
 }
 
-func (s *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*models.Booking, error) {
+func (store *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*models.Booking, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -60,7 +61,7 @@ func (s *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*mod
 
 	var booking *models.Booking
 
-	res := s.coll.FindOne(ctx, bson.M{"_id": objID})
+	res := store.collection.FindOne(ctx, bson.M{"_id": objID})
 	if err := res.Decode(&booking); err != nil {
 		return nil, err
 	}
@@ -68,8 +69,8 @@ func (s *MongoBookingStore) GetBookingByID(ctx context.Context, id string) (*mod
 	return booking, nil
 }
 
-func (s *MongoBookingStore) InsertBooking(ctx context.Context, booking *models.Booking) (*models.Booking, error) {
-	res, err := s.coll.InsertOne(ctx, booking)
+func (store *MongoBookingStore) InsertBooking(ctx context.Context, booking *models.Booking) (*models.Booking, error) {
+	res, err := store.collection.InsertOne(ctx, booking)
 	if err != nil {
 		return nil, err
 	}
@@ -77,4 +78,18 @@ func (s *MongoBookingStore) InsertBooking(ctx context.Context, booking *models.B
 	booking.ID = res.InsertedID.(primitive.ObjectID)
 
 	return booking, nil
+}
+
+func (store *MongoBookingStore) UpdateBooking(ctx context.Context, id string, update bson.M) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = store.collection.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": update})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

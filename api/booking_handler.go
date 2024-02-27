@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/FerMusicComposer/hotel-reservation-backend/db"
-	"github.com/FerMusicComposer/hotel-reservation-backend/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -26,18 +25,18 @@ func NewBookingHandler(bookingStore db.BookingStore) *BookingHandler {
 // ADMIN ONLY ROUTES
 // -----------------
 
-func (h *BookingHandler) HandleGetAllBookings(c *fiber.Ctx) error {
-	bookings, err := h.bookingStore.GetBookings(c.Context(), bson.M{})
+func (bookingHandler *BookingHandler) HandleGetAllBookings(ctx *fiber.Ctx) error {
+	bookings, err := bookingHandler.bookingStore.GetBookings(ctx.Context(), bson.M{})
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(bookings)
+	return ctx.JSON(bookings)
 }
 
-func (h *BookingHandler) HandleGetAllBookingsWithinDateRange(c *fiber.Ctx) error {
+func (bookingHandler *BookingHandler) HandleGetAllBookingsWithinDateRange(ctx *fiber.Ctx) error {
 	var params BookingQueryParams
-	if err := c.QueryParser(&params); err != nil {
+	if err := ctx.QueryParser(&params); err != nil {
 		return err
 	}
 
@@ -46,44 +45,56 @@ func (h *BookingHandler) HandleGetAllBookingsWithinDateRange(c *fiber.Ctx) error
 		"toDate":   bson.M{"$lte": params.ToDate},
 	}
 
-	bookings, err := h.bookingStore.GetBookings(c.Context(), where)
+	bookings, err := bookingHandler.bookingStore.GetBookings(ctx.Context(), where)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(bookings)
+	return ctx.JSON(bookings)
 }
 
 // -----------
 // USER ROUTES
 // -----------
-func (h *BookingHandler) HandleGetUserBooking(c *fiber.Ctx) error {
-	id := c.Params("id")
+func (bookingHandler *BookingHandler) HandleGetUserBooking(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 
-	booking, err := h.bookingStore.GetBookingByID(c.Context(), id)
+	booking, err := bookingHandler.bookingStore.GetBookingByID(ctx.Context(), id)
 	if err != nil {
 		return err
 	}
 
-	user, ok := c.Context().UserValue("user").(*models.User)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(
-			fiber.Map{
-				"error": "internal server error",
-			},
-		)
+	err = isUserToken(ctx, booking.UserID)
+	if err != nil {
+		return err
 	}
 
-	if booking.UserID != user.ID {
-		return c.Status(fiber.StatusUnauthorized).JSON(
-			fiber.Map{
-				"error": "unauthorized",
-			},
-		)
-	}
-	return c.JSON(booking)
+	return ctx.JSON(booking)
 }
 
-func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
-	return nil
+func (bookingHandler *BookingHandler) HandleCancelBooking(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	booking, err := bookingHandler.bookingStore.GetBookingByID(ctx.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	err = isUserToken(ctx, booking.UserID)
+	if err != nil {
+		return err
+	}
+
+	update := bson.M{
+		"isCancelled": true,
+	}
+
+	err = bookingHandler.bookingStore.UpdateBooking(ctx.Context(), id, update)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "booking cancelled",
+	})
 }
