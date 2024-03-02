@@ -367,7 +367,7 @@
 								"header": [
 									{
 										"key": "x-api-token",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwODkxNjkzMiwiaWQiOiI2NWRiYmNlNDc0OTI5NjA3ZjYzZWQ2MTkiLCJyb2xlIjoidXNlciJ9.cA-I2FfM6ZOjaUmJwSOO-YTn2UUh4e-beixwQr3htds",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwOTQzMTY0MSwiaWQiOiI2NWUyZjBjM2EzOTljMWU5MzgxYmZjZDkiLCJyb2xlIjoidXNlciJ9.PG56u8k4ib08ea1IfLPLYj2tflT3GhHX6Yxmpzm8Dgo",
 										"type": "text"
 									}
 								],
@@ -381,7 +381,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:5000/api/v1/room/65dbbce474929607f63ed605/book",
+									"raw": "http://localhost:5000/api/v1/room/65e2f0c2a399c1e9381bfcc5/book",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -391,7 +391,7 @@
 										"api",
 										"v1",
 										"room",
-										"65dbbce474929607f63ed605",
+										"65e2f0c2a399c1e9381bfcc5",
 										"book"
 									]
 								}
@@ -399,7 +399,7 @@
 							"response": []
 						},
 						{
-							"name": "InsertRoom",
+							"name": "InsertRoom - Admin only",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -410,13 +410,13 @@
 									},
 									{
 										"key": "x-api-token",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA4ODc3MjYyLCJpZCI6IjY1ZGIyNmU5MmEwM2JiNjYxNzNkNWFmYiJ9.TTF2rr33_MrA3_DlrketeLeUR0gnKgSq3TntoUt9MyU",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbGxlckBtZS5jb20iLCJleHBpcmVzIjoxNzA5NDMyODkxLCJpZCI6IjY1ZTJmMGMzYTM5OWMxZTkzODFiZmNkYSIsInJvbGUiOiJhZG1pbiJ9.0M8tr6GMS0qbFIBDoiSe3Ky9bQcGUG5Wu6rtHcNkR-4",
 										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"hotelID\": \"65db26e82a03bb66173d5aea\",\r\n    \"size\": \"Penthouse\",\r\n    \"price\": 899.99,\r\n    \"maxcapacity\": 10\r\n}",
+									"raw": "{\r\n    \"hotelID\": \"65e2f0c2a399c1e9381bfcd3\",\r\n    \"size\": \"Penthouse\",\r\n    \"price\": 899.99,\r\n    \"maxcapacity\": 10\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -424,7 +424,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:5000/api/v1/room",
+									"raw": "http://localhost:5000/api/v1/admin/room",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -433,6 +433,7 @@
 									"path": [
 										"api",
 										"v1",
+										"admin",
 										"room"
 									]
 								}
@@ -502,6 +503,35 @@
 											"value": "",
 											"disabled": true
 										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CancelBooking",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-api-token",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmVAbWUuY29tIiwiZXhwaXJlcyI6MTcwOTQzMTY0MSwiaWQiOiI2NWUyZjBjM2EzOTljMWU5MzgxYmZjZDkiLCJyb2xlIjoidXNlciJ9.PG56u8k4ib08ea1IfLPLYj2tflT3GhHX6Yxmpzm8Dgo",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/v1/booking/65e3a6b7efad655ada5c26ac/cancel",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"v1",
+										"booking",
+										"65e3a6b7efad655ada5c26ac",
+										"cancel"
 									]
 								}
 							},

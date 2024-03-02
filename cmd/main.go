@@ -43,8 +43,8 @@ func main() {
 	authHandler := api.NewAuthHandler(userStore)
 	userHandler := api.NewUserHandler(userStore)
 	hotelHandler := api.NewHotelHandler(hotelStore)
-	roomHandler := api.NewRoomHandler(roomStore, bookingStore, hotelStore)
-	bookingHandler := api.NewBookingHandler(bookingStore)
+	roomHandler := api.NewRoomHandler(roomStore, hotelStore)
+	bookingHandler := api.NewBookingHandler(bookingStore, roomStore)
 
 	app := fiber.New(fiberConfig)
 	auth := app.Group("/api")
@@ -58,6 +58,7 @@ func main() {
 	admin.Get("/booking", bookingHandler.HandleGetAllBookings)
 	admin.Get("/booking", bookingHandler.HandleGetAllBookingsWithinDateRange)
 	admin.Get("/user", userHandler.HandleGetUsers)
+	admin.Post("/room", roomHandler.HandlePostRoom)
 
 	// USER ROUTES
 	apiV1.Get("/user/:id", userHandler.HandleGetUser)
@@ -73,10 +74,10 @@ func main() {
 	// ROOM ROUTES
 	apiV1.Get("/room", roomHandler.HandleGetRooms)
 	apiV1.Post("/room/:id/book", roomHandler.HandleBookRoom)
-	apiV1.Post("/room", roomHandler.HandlePostRoom)
 
 	// BOOKING ROUTES
 	apiV1.Get("/booking/:id", bookingHandler.HandleGetUserBooking)
+	apiV1.Post("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
 
 	app.Listen(*listenAddr)
 }
