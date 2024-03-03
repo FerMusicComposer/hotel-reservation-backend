@@ -17,10 +17,11 @@ type RoomHandler struct {
 	hotelStore   db.HotelStore
 }
 
-func NewRoomHandler(roomStore db.RoomStore, hotelStore db.HotelStore) *RoomHandler {
+func NewRoomHandler(roomStore db.RoomStore, hotelStore db.HotelStore, bookingStore db.BookingStore) *RoomHandler {
 	return &RoomHandler{
-		roomStore:  roomStore,
-		hotelStore: hotelStore,
+		roomStore:    roomStore,
+		hotelStore:   hotelStore,
+		bookingStore: bookingStore,
 	}
 }
 
@@ -119,20 +120,19 @@ func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 	}
 
 	if err := params.validateBookingParams(ctx, roomHandler.roomStore, roomId); err != nil {
+		fmt.Println("error validating booking params: ", err)
 		return err
 	}
 
-	booking := models.Booking{
+	booking := &models.Booking{
 		UserID:    user.ID,
 		RoomID:    roomId,
-		FromDate:  params.FromDate,
-		ToDate:    params.ToDate,
+		Checkin:   params.Checkin,
+		Checkout:  params.Checkout,
 		NumPeople: params.NumPeople,
 	}
 
-	fmt.Printf("%+v\n", booking)
-
-	bkng, err := roomHandler.bookingStore.InsertBooking(ctx.Context(), &booking)
+	bkng, err := roomHandler.bookingStore.InsertBooking(ctx.Context(), booking)
 	if err != nil {
 		return err
 	}
@@ -142,11 +142,12 @@ func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 		"status": models.RoomStatus{
 			Status:     "booked",
 			BookingID:  bkng.ID,
-			BookedTo:   bkng.ToDate,
-			BookedFrom: bkng.FromDate,
+			BookedTo:   bkng.Checkout,
+			BookedFrom: bkng.Checkin,
 		},
 	}}
 	if err = roomHandler.roomStore.UpdateRoom(ctx.Context(), filter, update); err != nil {
+		fmt.Println("error updating room: ", err)
 		return err
 	}
 

@@ -43,7 +43,7 @@ func main() {
 	authHandler := api.NewAuthHandler(userStore)
 	userHandler := api.NewUserHandler(userStore)
 	hotelHandler := api.NewHotelHandler(hotelStore)
-	roomHandler := api.NewRoomHandler(roomStore, hotelStore)
+	roomHandler := api.NewRoomHandler(roomStore, hotelStore, bookingStore)
 	bookingHandler := api.NewBookingHandler(bookingStore, roomStore)
 
 	app := fiber.New(fiberConfig)

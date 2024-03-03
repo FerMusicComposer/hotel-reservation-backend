@@ -89,8 +89,8 @@ type RoomParams struct {
 }
 
 type BookingParams struct {
-	FromDate    time.Time `json:"fromDate"`
-	ToDate      time.Time `json:"toDate"`
+	Checkin     time.Time `json:"checkin"`
+	Checkout    time.Time `json:"checkout"`
 	NumPeople   int       `json:"numPeople"`
 	IsCancelled bool      `json:"isCancelled"`
 }
@@ -128,11 +128,11 @@ func (params BookingParams) validateBookingParams(ctx *fiber.Ctx, roomstore db.R
 		return err
 	}
 
-	if params.FromDate.Before(now) {
+	if params.Checkin.Before(now) {
 		return fmt.Errorf("cannot book a room in the past")
 	}
 
-	if params.FromDate.After(params.ToDate) {
+	if params.Checkin.After(params.Checkout) {
 		return fmt.Errorf("from date cannot be superior to end date")
 	}
 
@@ -145,7 +145,7 @@ func (params BookingParams) validateBookingParams(ctx *fiber.Ctx, roomstore db.R
 	}
 
 	for _, status := range room.Status {
-		if datesAreWithinRange(params.FromDate, params.ToDate, status.BookedFrom, status.BookedTo) &&
+		if datesAreWithinRange(params.Checkin, params.Checkout, status.BookedFrom, status.BookedTo) &&
 			status.Status != "cancelled" {
 			return fmt.Errorf("room is already booked")
 		}
@@ -154,13 +154,13 @@ func (params BookingParams) validateBookingParams(ctx *fiber.Ctx, roomstore db.R
 	return nil
 }
 
-func datesAreWithinRange(fromDate time.Time, toDate time.Time, bookedFrom time.Time, bookedTo time.Time) bool {
-	if fromDate.Equal(bookedFrom) ||
-		toDate.Equal(bookedTo) ||
-		fromDate.After(bookedFrom) && toDate.Before(bookedTo) ||
-		fromDate.Before(bookedFrom) && toDate.After(bookedTo) ||
-		fromDate.Before(bookedTo) && (toDate.Equal(bookedTo) || toDate.After(bookedTo)) ||
-		fromDate.Before(bookedFrom) && (toDate.Equal(bookedFrom) || (toDate.After(bookedFrom) && toDate.Before(bookedTo))) {
+func datesAreWithinRange(checkin time.Time, checkout time.Time, bookedFrom time.Time, bookedTo time.Time) bool {
+	if checkin.Equal(bookedFrom) ||
+		checkout.Equal(bookedTo) ||
+		checkin.After(bookedFrom) && checkout.Before(bookedTo) ||
+		checkin.Before(bookedFrom) && checkout.After(bookedTo) ||
+		checkin.Before(bookedTo) && (checkout.Equal(bookedTo) || checkout.After(bookedTo)) ||
+		checkin.Before(bookedFrom) && (checkout.Equal(bookedFrom) || (checkout.After(bookedFrom) && checkout.Before(bookedTo))) {
 
 		return true
 	}
