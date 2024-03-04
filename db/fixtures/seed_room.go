@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func seedRoom(size string, seaside bool, price float64, maxCapacity int, hotelID primitive.ObjectID, roomStore db.RoomStore, ctx context.Context) primitive.ObjectID {
+func SeedRoom(size string, seaside bool, price float64, maxCapacity int, hotelID primitive.ObjectID, roomStore db.RoomStore, ctx context.Context) primitive.ObjectID {
 
 	room := models.Room{
 		HotelId:     hotelID,

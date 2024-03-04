@@ -9,7 +9,7 @@ import (
 	"github.com/FerMusicComposer/hotel-reservation-backend/models"
 )
 
-func seedUser(fname, lname, email, password, role string, userStore db.UserStore, ctx context.Context) {
+func SeedUser(fname, lname, email, password, role string, userStore db.UserStore, ctx context.Context) {
 	user, err := models.NewUserFromParams(models.CreateUserParams{
 		FirstName: fname,
 		LastName:  lname,

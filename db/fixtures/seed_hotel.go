@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, roomStore db.RoomStore, ctx context.Context) {
+func SeedHotel(name, location string, rating float64, hotelStore db.HotelStore, roomStore db.RoomStore, ctx context.Context) {
 	hotel := models.Hotel{
 		Name:     name,
 		Location: location,
@@ -27,7 +27,7 @@ func seedHotel(name, location string, rating float64, hotelStore db.HotelStore, 
 	fmt.Println("inserted hotel: ", insertedHotel)
 
 	for _, room := range rooms {
-		insertedRoomID := seedRoom(room.Size, room.Seaside, room.Price, room.MaxCapacity, insertedHotel.ID, roomStore, ctx)
+		insertedRoomID := SeedRoom(room.Size, room.Seaside, room.Price, room.MaxCapacity, insertedHotel.ID, roomStore, ctx)
 
 		filter := bson.M{"_id": insertedHotel.ID}
 		update := bson.M{"$push": bson.M{"rooms": insertedRoomID}}

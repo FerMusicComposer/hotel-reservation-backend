@@ -4,14 +4,15 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/FerMusicComposer/hotel-reservation-backend/db"
 	"github.com/gofiber/fiber/v2"
 )
 
 func TestAuthenticate(t *testing.T) {
-	tdb := setup()
+	testDB := setup(db.DBURI, db.TestDBNAME)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := NewAuthHandler(testDB.UserStore)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	type testCase struct {
@@ -24,15 +25,15 @@ func TestAuthenticate(t *testing.T) {
 		{
 			name: "Successful authentication",
 			params: AuthParams{
-				Email:    "H3XK1@example.com",
-				Password: "password8978",
+				Email:    "jdoe@me.com",
+				Password: "password1123456789",
 			},
 			expectedStatusCode: http.StatusOK,
 		},
 		{
 			name: "Failing authentication with incorrect password",
 			params: AuthParams{
-				Email:    "H3XK1@example.com",
+				Email:    "jdoe@me.com",
 				Password: "wrongpassword",
 			},
 			expectedStatusCode: http.StatusUnauthorized,
@@ -41,7 +42,7 @@ func TestAuthenticate(t *testing.T) {
 			name: "Failing authentication with incorrect email",
 			params: AuthParams{
 				Email:    "wrongmail@example.com",
-				Password: "password8978",
+				Password: "password1123456789",
 			},
 			expectedStatusCode: http.StatusUnauthorized,
 		},
@@ -52,6 +53,4 @@ func TestAuthenticate(t *testing.T) {
 			testAuth(t, app, tc.params)
 		})
 	}
-
-	tdb.teardown(t)
 }

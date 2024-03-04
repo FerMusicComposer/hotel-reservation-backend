@@ -114,10 +114,10 @@ var users = []userData{
 	},
 }
 
-func SeedData() {
+func SeedData(mongoUri, dbName string) {
 	ctx := context.Background()
 
-	conn, err := db.NewMongoConnection(db.DBURI, db.DBNAME)
+	conn, err := db.NewMongoConnection(mongoUri, dbName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -131,12 +131,12 @@ func SeedData() {
 	userStore := db.NewMongoUserStore(conn)
 
 	for _, hotel := range hotels {
-		seedHotel(hotel.name, hotel.location, hotel.rating, hotelStore, roomStore, ctx)
+		SeedHotel(hotel.name, hotel.location, hotel.rating, hotelStore, roomStore, ctx)
 		fmt.Println("=============================")
 	}
 
 	for _, user := range users {
-		seedUser(user.fname, user.lname, user.email, user.password, user.role, userStore, ctx)
+		SeedUser(user.fname, user.lname, user.email, user.password, user.role, userStore, ctx)
 		fmt.Println("------------------------------")
 	}
 

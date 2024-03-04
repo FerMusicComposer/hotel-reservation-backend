@@ -3,15 +3,16 @@ package api
 import (
 	"testing"
 
+	"github.com/FerMusicComposer/hotel-reservation-backend/db"
 	"github.com/FerMusicComposer/hotel-reservation-backend/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 func TestPostUser(t *testing.T) {
-	tdb := setup()
+	testDB := setup(db.DBURI, db.TestDBNAME)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(testDB.UserStore)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := models.CreateUserParams{
