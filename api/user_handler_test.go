@@ -18,8 +18,8 @@ func TestPostUser(t *testing.T) {
 	params := models.CreateUserParams{
 		FirstName: "Leonardo",
 		LastName:  "da Vinci",
-		Email:     "H3XK1@example.com",
-		Password:  "password8978",
+		Email:     "ldavinci@me.com",
+		Password:  "password1123456789",
 	}
 
 	testPostUser(t, app, params)
