@@ -69,7 +69,7 @@ func testPostUser(t *testing.T, app *fiber.App, params models.CreateUserParams) 
 	}
 }
 
-func testAuth(t *testing.T, app *fiber.App, params AuthParams) {
+func testAuth(t *testing.T, app *fiber.App, params AuthParams) *AuthResponse {
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
 	req.Header.Add("Content-Type", "application/json")
@@ -90,4 +90,35 @@ func testAuth(t *testing.T, app *fiber.App, params AuthParams) {
 	}
 
 	fmt.Printf("%+v\n", response)
+
+	return &response
+}
+
+func testAdminGetAllBookings(t *testing.T, app *fiber.App, params AuthParams) {
+	authRes := testAuth(t, app, params)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/bookings", nil)
+	req.Header.Add("x-api-token", authRes.Token)
+
+	res, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("user unauthorized")
+	} else {
+
+		var bookings *[]models.Booking
+
+		if err := json.NewDecoder(res.Body).Decode(&bookings); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(*bookings) == 0 {
+			t.Fatalf("expected bookings to be present in the response")
+		}
+
+		fmt.Printf("%+v\n", bookings)
+	}
 }

@@ -129,6 +129,7 @@ func SeedData(mongoUri, dbName string) {
 	hotelStore := db.NewMongoHotelStore(conn)
 	roomStore := db.NewMongoRoomStore(conn)
 	userStore := db.NewMongoUserStore(conn)
+	bookingStore := db.NewMongoBookingStore(conn)
 
 	for _, hotel := range hotels {
 		SeedHotel(hotel.name, hotel.location, hotel.rating, hotelStore, roomStore, ctx)
@@ -139,6 +140,8 @@ func SeedData(mongoUri, dbName string) {
 		SeedUser(user.fname, user.lname, user.email, user.password, user.role, userStore, ctx)
 		fmt.Println("------------------------------")
 	}
+
+	SeedBooking(userStore, hotelStore, roomStore, bookingStore, ctx)
 
 	conn.Database.Client().Disconnect(ctx)
 
