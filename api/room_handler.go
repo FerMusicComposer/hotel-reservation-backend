@@ -28,25 +28,25 @@ func NewRoomHandler(roomStore db.RoomStore, hotelStore db.HotelStore, bookingSto
 func (roomHandler *RoomHandler) HandleGetRooms(ctx *fiber.Ctx) error {
 	rooms, err := roomHandler.roomStore.GetRooms(ctx.Context())
 	if err != nil {
-		return err
+		return Internal.from("HandleGetRooms => error obtaining rooms", err).Err
 	}
 
 	return ctx.JSON(rooms)
 }
-func (roomHandler *RoomHandler) HandleGetRoomsByHotelID(c *fiber.Ctx) error {
-	id := c.Params("id")
+func (roomHandler *RoomHandler) HandleGetRoomsByHotelID(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return Internal.from("HandleGetRoomsByHotelID => error converting ID(string) to ObjectID", err).Err
 	}
 
 	filter := bson.M{"hotelId": oid}
-	rooms, err := roomHandler.roomStore.GetRoomsByHotelID(c.Context(), filter)
+	rooms, err := roomHandler.roomStore.GetRoomsByHotelID(ctx.Context(), filter)
 	if err != nil {
-		return err
+		return InvalidID.from("HandleGetRoomsByHotelID => error obtaining rooms by hotel ID", err).Err
 	}
 
-	return c.JSON(rooms)
+	return ctx.JSON(rooms)
 }
 
 func (roomHandler *RoomHandler) HandleGetRoomByID(ctx *fiber.Ctx) error {
@@ -54,7 +54,7 @@ func (roomHandler *RoomHandler) HandleGetRoomByID(ctx *fiber.Ctx) error {
 
 	room, err := roomHandler.roomStore.GetRoomByID(ctx.Context(), id)
 	if err != nil {
-		return err
+		return InvalidID.from("HandleGetRoomByID => error obtaining room by ID", err).Err
 	}
 
 	return ctx.JSON(room)
@@ -63,16 +63,16 @@ func (roomHandler *RoomHandler) HandleGetRoomByID(ctx *fiber.Ctx) error {
 func (roomHandler *RoomHandler) HandlePostRoom(ctx *fiber.Ctx) error {
 	var params RoomParams
 	if err := ctx.BodyParser(&params); err != nil {
-		return err
+		return BadRequest.from("HandlePostRoom => error parsing request body", err).Err
 	}
 
 	if err := params.validateRoomParams(ctx, roomHandler.hotelStore); err != nil {
-		return err
+		return Internal.from("HandlePostRoom => error validating room params", err).Err
 	}
 
 	hotelOID, err := primitive.ObjectIDFromHex(params.HotelID)
 	if err != nil {
-		return err
+		return InvalidID.from("HandlePostRoom => error converting hotel ID(string) to ObjectID", err).Err
 	}
 
 	room, err := roomHandler.roomStore.InsertRoom(ctx.Context(), &models.Room{
@@ -88,13 +88,13 @@ func (roomHandler *RoomHandler) HandlePostRoom(ctx *fiber.Ctx) error {
 		},
 	})
 	if err != nil {
-		return err
+		return Internal.from("HandlePostRoom => error inserting room", err).Err
 	}
 
 	filter := bson.M{"_id": room.HotelId}
 	update := bson.M{"$push": bson.M{"rooms": room.ID}}
 	if err = roomHandler.hotelStore.UpdateHotel(ctx.Context(), filter, update); err != nil {
-		return err
+		return Internal.from("HandlePostRoom => error updating hotel", err).Err
 	}
 
 	return ctx.JSON(room)
@@ -103,12 +103,12 @@ func (roomHandler *RoomHandler) HandlePostRoom(ctx *fiber.Ctx) error {
 func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 	var params BookingParams
 	if err := ctx.BodyParser(&params); err != nil {
-		return err
+		return BadRequest.from("HandleBookRoom => error parsing request body", err).Err
 	}
 
 	roomId, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
-		return err
+		return InvalidID.from("HandleBookRoom => error converting room ID(string) to ObjectID", err).Err
 	}
 
 	user, ok := ctx.Context().Value("user").(*models.User)
@@ -120,8 +120,7 @@ func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 	}
 
 	if err := params.validateBookingParams(ctx, roomHandler.roomStore, roomId); err != nil {
-		fmt.Println("error validating booking params: ", err)
-		return err
+		return Internal.from("HandleBookRoom => error validating booking params", err).Err
 	}
 
 	booking := &models.Booking{
@@ -134,7 +133,7 @@ func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 
 	bkng, err := roomHandler.bookingStore.InsertBooking(ctx.Context(), booking)
 	if err != nil {
-		return err
+		return Internal.from("HandleBookRoom => error inserting booking", err).Err
 	}
 
 	filter := bson.M{"_id": roomId}
@@ -148,7 +147,7 @@ func (roomHandler *RoomHandler) HandleBookRoom(ctx *fiber.Ctx) error {
 	}}
 	if err = roomHandler.roomStore.UpdateRoom(ctx.Context(), filter, update); err != nil {
 		fmt.Println("error updating room: ", err)
-		return err
+		return Internal.from("HandleBookRoom => error updating room", err).Err
 	}
 
 	return ctx.JSON(bkng)

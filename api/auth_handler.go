@@ -17,20 +17,20 @@ func NewAuthHandler(userStore db.UserStore) *AuthHandler {
 	return &AuthHandler{userStore: userStore}
 }
 
-func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
+func (authHandler *AuthHandler) HandleAuthenticate(ctx *fiber.Ctx) error {
 	var params AuthParams
 
-	if err := c.BodyParser(&params); err != nil {
-		return err
+	if err := ctx.BodyParser(&params); err != nil {
+		return Internal.from("HandleAuthenticate => ctx.BodyParser", err).Err
 	}
 
-	user, err := h.userStore.GetUserByEmail(c.Context(), params.Email)
+	user, err := authHandler.userStore.GetUserByEmail(ctx.Context(), params.Email)
 	if err != nil {
-		return invalidCredentials(c)
+		return invalidCredentials(ctx)
 	}
 
 	if !models.IsPasswordValid(user.EncryptedPassword, params.Password) {
-		return invalidCredentials(c)
+		return invalidCredentials(ctx)
 	}
 
 	token := createTokenFromUser(user)
@@ -44,5 +44,5 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 
 	fmt.Printf("authenticated --> %s ; role: %s", user.Email, user.Role)
 
-	return c.JSON(response)
+	return ctx.JSON(response)
 }

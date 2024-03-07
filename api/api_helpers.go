@@ -33,30 +33,20 @@ type AuthResponse struct {
 func isUserToken(ctx *fiber.Ctx, bookingUserID primitive.ObjectID) error {
 	user, ok := ctx.Context().UserValue("user").(*models.User)
 	if !ok {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(
-			fiber.Map{
-				"error": "internal server error",
-			},
-		)
+		return Internal.with(http.StatusInternalServerError).Err
+
 	}
 
 	if bookingUserID != user.ID {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(
-			fiber.Map{
-				"error": "unauthorized",
-			},
-		)
+		return Unauthorized.with(http.StatusUnauthorized).Err
 	}
 
 	return nil
 }
 
-func invalidCredentials(c *fiber.Ctx) error {
+func invalidCredentials(ctx *fiber.Ctx) error {
 	fmt.Println("unauthorized")
-	return c.Status(http.StatusUnauthorized).JSON(AuthResponse{
-		Status: http.StatusUnauthorized,
-		Msg:    "unauthorized",
-	})
+	return Unauthorized.from("invalid credentials", fmt.Errorf("Error %d: Unauthorized", ctx.Response().StatusCode())).Err
 }
 
 func createTokenFromUser(user *models.User) string {
@@ -71,7 +61,8 @@ func createTokenFromUser(user *models.User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		fmt.Printf("Error signing token: %v", err)
+		internal := Internal.from("createTokenFromUser", err)
+		fmt.Printf("Error signing token: %v", internal.Err)
 	}
 
 	return tokenStr
@@ -99,22 +90,22 @@ func (params RoomParams) validateRoomParams(ctx *fiber.Ctx, hotelStore db.HotelS
 	_, err := hotelStore.GetHotelByID(ctx.Context(), params.HotelID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("invalid hotel id")
+			return InvalidID.from("validateRoomParams => GetHotelByID", fmt.Errorf("%d Bad Request: Invalid Hotel ID.\nAdditional Info: %v", http.StatusBadRequest, err)).Err
 		}
 
-		return fmt.Errorf("internal server error")
+		return Internal.from("validateRoomParams => GetHotelByID", err).Err
 	}
 
 	if params.Size == "" {
-		return fmt.Errorf("must specify a room size")
+		return BadRequest.from("validateRoomParams => Check Size", fmt.Errorf("%d Bad Request: Size cannot be empty", http.StatusBadRequest)).Err
 	}
 
 	if params.Price <= 0 {
-		return fmt.Errorf("price cannot be negative or zero")
+		return BadRequest.from("validateRoomParams => Check Price", fmt.Errorf("%d Bad Request: Price cannot be negative or zero", http.StatusBadRequest)).Err
 	}
 
 	if params.MaxCap <= 0 {
-		return fmt.Errorf("max capacity cannot be negative or zero")
+		return BadRequest.from("validateRoomParams => Check MaxCap", fmt.Errorf("%d Bad Request: MaxCapacity cannot be negative or zero", http.StatusBadRequest)).Err
 	}
 
 	return nil
@@ -125,23 +116,23 @@ func (params BookingParams) validateBookingParams(ctx *fiber.Ctx, roomstore db.R
 
 	room, err := roomstore.GetRoomByID(ctx.Context(), roomID.Hex())
 	if err != nil {
-		return err
+		return InvalidID.from("validateBookingParams => GetRoomByID", err).Err
 	}
 
 	if params.Checkin.Before(now) {
-		return fmt.Errorf("cannot book a room in the past")
+		return BadRequest.from("validateBookingParams => Check Checkin date", fmt.Errorf("%d Bad Request: Checkin date cannot be in the past", http.StatusBadRequest)).Err
 	}
 
 	if params.Checkin.After(params.Checkout) {
-		return fmt.Errorf("from date cannot be superior to end date")
+		return BadRequest.from("validateBookingParams => Check Checkin date", fmt.Errorf("%d Bad Request: Checkin date cannot be after checkout date", http.StatusBadRequest)).Err
 	}
 
 	if params.NumPeople <= 0 {
-		return fmt.Errorf("invalid number of people")
+		return BadRequest.from("validateBookingParams => Check NumPeople", fmt.Errorf("%d Bad Request: NumPeople cannot be negative or zero", http.StatusBadRequest)).Err
 	}
 
 	if room.MaxCapacity < params.NumPeople {
-		return fmt.Errorf("room capacity exedeced")
+		return BadRequest.from("validateBookingParams => Check MaxCapacity", fmt.Errorf("%d Bad Request: NumPeople cannot be greater than MaxCapacity", http.StatusBadRequest)).Err
 	}
 
 	for _, status := range room.Status {

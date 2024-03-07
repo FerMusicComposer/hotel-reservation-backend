@@ -20,79 +20,79 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 	return &UserHandler{userStore: userStore}
 }
 
-func (u *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
-	users, err := u.userStore.GetUsers(c.Context())
+func (userHandler *UserHandler) HandleGetUsers(ctx *fiber.Ctx) error {
+	users, err := userHandler.userStore.GetUsers(ctx.Context())
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(users)
+	return ctx.JSON(users)
 }
 
-func (u *UserHandler) HandleGetUser(c *fiber.Ctx) error {
-	id := c.Params("id")
-	user, err := u.userStore.GetUserByID(c.Context(), id)
+func (userHandler *UserHandler) HandleGetUser(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	user, err := userHandler.userStore.GetUserByID(ctx.Context(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return c.JSON(map[string]string{"error": fmt.Sprintf("user with ID %v not found", id)})
+			return ctx.JSON(map[string]string{"error": fmt.Sprintf("user with ID %v not found", id)})
 		}
-		return err
+		return Internal.from("HandleGetUser => error obtaining user by ID", err).Err
 	}
 
-	return c.JSON(user)
+	return ctx.JSON(user)
 }
 
-func (u *UserHandler) HandlePostUser(c *fiber.Ctx) error {
+func (userHandler *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
 	var params models.CreateUserParams
-	if err := c.BodyParser(&params); err != nil {
-		return err
+	if err := ctx.BodyParser(&params); err != nil {
+		return BadRequest.from("HandlePostUser => error parsing user params", err).Err
 	}
 
 	if errors := params.Validate(); len(errors) > 0 {
-		return c.JSON(errors)
+		return ctx.JSON(errors)
 	}
 
 	user, err := models.NewUserFromParams(params)
 	if err != nil {
-		return err
+		return Internal.from("HandlePostUser => error creating user from params", err).Err
 	}
 
-	insertedUser, err := u.userStore.InsertUser(c.Context(), user)
+	insertedUser, err := userHandler.userStore.InsertUser(ctx.Context(), user)
 	if err != nil {
-		return err
+		return Internal.from("HandlePostUser => error inserting user", err).Err
 	}
 
-	return c.JSON(insertedUser)
+	return ctx.JSON(insertedUser)
 }
 
-func (u *UserHandler) HandlePutUser(c *fiber.Ctx) error {
+func (userHandler *UserHandler) HandlePutUser(ctx *fiber.Ctx) error {
 	var (
 		params models.UpdateUserParams
-		userId = c.Params("id")
+		userId = ctx.Params("id")
 	)
 
 	oid, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
-		return err
+		return InvalidID.from("HandlePutUser => error converting ID(string) to ObjectID", err).Err
 	}
 
-	if err := c.BodyParser(&params); err != nil {
-		return err
+	if err := ctx.BodyParser(&params); err != nil {
+		return BadRequest.from("HandlePutUser => error parsing user params", err).Err
 	}
 
 	filter := bson.M{"_id": oid}
-	if err := u.userStore.UpdateUser(c.Context(), filter, params); err != nil {
-		return c.JSON(map[string]string{"error": fmt.Sprintf("failed to update userID %v: %v", userId, err.Error())})
+	if err := userHandler.userStore.UpdateUser(ctx.Context(), filter, params); err != nil {
+		return ctx.JSON(map[string]string{"error": fmt.Sprintf("failed to update userID %v: %v", userId, err.Error())})
 	}
-	return c.JSON(map[string]string{"message": fmt.Sprintf("successfully updated userID %v", userId)})
+	return ctx.JSON(map[string]string{"message": fmt.Sprintf("successfully updated userID %v", userId)})
 }
 
-func (u *UserHandler) HandleDeleteUser(c *fiber.Ctx) error {
-	userId := c.Params("id")
+func (userHandler *UserHandler) HandleDeleteUser(ctx *fiber.Ctx) error {
+	userId := ctx.Params("id")
 
-	if err := u.userStore.DeleteUser(c.Context(), userId); err != nil {
-		return c.JSON(map[string]string{"error": fmt.Sprintf("failed to delete userID %v: %v", userId, err.Error())})
+	if err := userHandler.userStore.DeleteUser(ctx.Context(), userId); err != nil {
+		return ctx.JSON(map[string]string{"error": fmt.Sprintf("failed to delete userID %v: %v", userId, err.Error())})
 	}
 
-	return c.JSON(map[string]string{"message": fmt.Sprintf("successfully deleted userID %v", userId)})
+	return ctx.JSON(map[string]string{"message": fmt.Sprintf("successfully deleted userID %v", userId)})
 }
