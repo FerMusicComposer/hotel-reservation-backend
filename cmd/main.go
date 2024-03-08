@@ -14,16 +14,13 @@ import (
 
 // custom fiber config for custom error handling
 var fiberConfig = fiber.Config{
-	// Override default error handler
 	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 		appErr, ok := err.(*api.AppError)
 		if ok {
-			// Use the HTTP status code and message from the AppError
-			// You might also want to log the error or handle it based on its type
-			ctx.Status(appErr.Code) // Set the status code
+			ctx.Status(appErr.Code)
 			return ctx.JSON(map[string]interface{}{
 				"error":   appErr.Error(),
-				"details": appErr.Err, // Optionally include the underlying error if you want to expose it
+				"details": appErr.Err,
 			})
 		}
 		return ctx.JSON(map[string]string{"error": err.Error()})
