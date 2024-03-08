@@ -3,7 +3,7 @@
 1st project from Anthony GG's Full Time Go Dev course
 
 I have implemented the mongo client in a slightly different way, that is cleaner in my opinion.
-Also, the room model, booking circuit and authorization are different, as I have included some minor business logic which was out of the scope of the course, and for authorization, I did a simple RBAC middleware, that looks similar to the one of the course, but checks the user role from the JWT token claims, instead of the role from the database.
+Also, the room model, booking circuit and authorization are different, as I have included some minor business logic which was out of the scope of the course, and for authorization, I did a simple RBAC middleware, that looks similar to the one of the course, but checks the user role from the JWT token claims, instead of the role from the database. Also I did a custom error implementation which vastly defers from the one in the course
 
 The Postman endpoints collection is included for anyone that wants to test the API
 
