@@ -1,6 +1,10 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 type ErrorType int
 
@@ -32,6 +36,24 @@ var (
 	Forbidden     = AppError{ErrType: errForbidden}
 	BadRequest    = AppError{ErrType: errBadRequest}
 )
+
+// =================
+// API ERROR CONFIG
+// =================
+// custom fiber config for custom error handling
+var FiberConfig = fiber.Config{
+	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+		appErr, ok := err.(*AppError)
+		if ok {
+			ctx.Status(appErr.Code)
+			return ctx.JSON(map[string]interface{}{
+				"error":   appErr.Error(),
+				"details": appErr.Err,
+			})
+		}
+		return ctx.JSON(map[string]string{"error": err.Error()})
+	},
+}
 
 func (appErr AppError) Error() string {
 	switch appErr.ErrType {

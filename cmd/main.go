@@ -12,21 +12,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// custom fiber config for custom error handling
-var fiberConfig = fiber.Config{
-	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-		appErr, ok := err.(*api.AppError)
-		if ok {
-			ctx.Status(appErr.Code)
-			return ctx.JSON(map[string]interface{}{
-				"error":   appErr.Error(),
-				"details": appErr.Err,
-			})
-		}
-		return ctx.JSON(map[string]string{"error": err.Error()})
-	},
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -53,7 +38,7 @@ func main() {
 	roomHandler := api.NewRoomHandler(roomStore, hotelStore, bookingStore)
 	bookingHandler := api.NewBookingHandler(bookingStore, roomStore)
 
-	app := fiber.New(fiberConfig)
+	app := fiber.New(api.FiberConfig)
 	auth := app.Group("/api")
 	apiV1 := app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 	admin := apiV1.Group("/admin", middleware.AdminAuth)
